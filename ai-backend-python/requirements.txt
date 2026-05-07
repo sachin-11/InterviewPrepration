@@ -1,0 +1,6 @@
+# Phase 1 — no external deps needed
+# Phase 2 onwards add here:
+# pandas==2.2.2
+# numpy==1.26.4
+# fastapi==0.111.0
+# uvicorn==0.30.1

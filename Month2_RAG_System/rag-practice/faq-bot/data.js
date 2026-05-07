@@ -1,0 +1,61 @@
+export const faqs = [
+  // Node.js
+  { id: "n1",  q: "What is Node.js?",                              a: "Node.js is a JavaScript runtime built on Chrome's V8 engine that allows running JavaScript on the server side.",                                    cat: "nodejs" },
+  { id: "n2",  q: "What is the event loop in Node.js?",            a: "The event loop processes callbacks from the event queue when the call stack is empty, enabling non-blocking async operations.",                       cat: "nodejs" },
+  { id: "n3",  q: "What is middleware in Express?",                a: "Middleware are functions that execute during the request-response cycle with access to req, res, and next objects.",                                   cat: "nodejs" },
+  { id: "n4",  q: "What are streams in Node.js?",                  a: "Streams process data in chunks continuously, useful for handling large files without loading everything into memory.",                                 cat: "nodejs" },
+  { id: "n5",  q: "What is clustering in Node.js?",                a: "Clustering creates child processes sharing the same port, utilizing all CPU cores for better performance.",                                           cat: "nodejs" },
+  { id: "n6",  q: "What is process.nextTick?",                     a: "process.nextTick fires a callback before any I/O events in the current iteration of the event loop.",                                                 cat: "nodejs" },
+  { id: "n7",  q: "What is the difference between require and import?", a: "require is CommonJS (synchronous), import is ES modules (static analysis). Use import with type:module in package.json.",                      cat: "nodejs" },
+  { id: "n8",  q: "What is npm?",                                  a: "npm is the Node Package Manager, used to install, manage, and share JavaScript packages.",                                                            cat: "nodejs" },
+  { id: "n9",  q: "What are worker threads?",                      a: "Worker threads allow CPU-intensive JavaScript tasks to run in parallel without blocking the main event loop.",                                        cat: "nodejs" },
+  { id: "n10", q: "What is Express.js?",                           a: "Express.js is a minimal and flexible Node.js web framework that provides routing, middleware, and HTTP utilities.",                                   cat: "nodejs" },
+
+  // JavaScript
+  { id: "j1",  q: "What is a closure in JavaScript?",              a: "A closure is a function that retains access to variables from its outer scope even after the outer function has returned.",                           cat: "javascript" },
+  { id: "j2",  q: "What is the difference between let and var?",   a: "let is block-scoped and not hoisted, while var is function-scoped and hoisted to the top of its function.",                                          cat: "javascript" },
+  { id: "j3",  q: "What is async/await?",                          a: "async/await is syntactic sugar over Promises that makes asynchronous code look and behave like synchronous code.",                                   cat: "javascript" },
+  { id: "j4",  q: "What is Promise.all?",                          a: "Promise.all takes an array of promises and resolves when all resolve, or rejects immediately if any one fails.",                                     cat: "javascript" },
+  { id: "j5",  q: "What is event delegation?",                     a: "Event delegation attaches a single event listener to a parent element to handle events from child elements using event bubbling.",                   cat: "javascript" },
+  { id: "j6",  q: "What is the prototype chain?",                  a: "The prototype chain is JavaScript's inheritance mechanism where objects inherit properties and methods from their prototype.",                        cat: "javascript" },
+  { id: "j7",  q: "What is destructuring in JavaScript?",          a: "Destructuring allows extracting values from arrays or properties from objects into distinct variables using a concise syntax.",                      cat: "javascript" },
+  { id: "j8",  q: "What is the spread operator?",                  a: "The spread operator (...) expands an iterable into individual elements, useful for copying arrays and merging objects.",                            cat: "javascript" },
+  { id: "j9",  q: "What is a generator function?",                 a: "Generator functions use function* syntax and yield to pause execution, returning an iterator that produces values on demand.",                       cat: "javascript" },
+  { id: "j10", q: "What is the difference between == and ===?",    a: "== performs type coercion before comparison, while === checks both value and type without coercion.",                                               cat: "javascript" },
+
+  // Database
+  { id: "d1",  q: "What is the difference between SQL and NoSQL?", a: "SQL uses structured tables with fixed schemas, NoSQL uses flexible document, key-value, or graph structures.",                                       cat: "database" },
+  { id: "d2",  q: "What is database indexing?",                    a: "Indexing creates a data structure that improves query speed by allowing the database to find rows without scanning the entire table.",               cat: "database" },
+  { id: "d3",  q: "What is Redis?",                                a: "Redis is an in-memory data store used for caching, session management, pub/sub messaging, and rate limiting.",                                       cat: "database" },
+  { id: "d4",  q: "What is database sharding?",                    a: "Sharding is horizontal partitioning of data across multiple database instances to distribute load and improve scalability.",                         cat: "database" },
+  { id: "d5",  q: "What is an ORM?",                               a: "ORM (Object-Relational Mapping) lets you query and manipulate database data using object-oriented programming instead of raw SQL.",                  cat: "database" },
+  { id: "d6",  q: "What is a database transaction?",               a: "A transaction is a sequence of operations that are executed as a single unit, ensuring ACID properties: Atomicity, Consistency, Isolation, Durability.", cat: "database" },
+  { id: "d7",  q: "What is MongoDB?",                              a: "MongoDB is a NoSQL document database that stores data as flexible JSON-like documents, making it easy to work with hierarchical data.",              cat: "database" },
+  { id: "d8",  q: "What is connection pooling?",                   a: "Connection pooling maintains a pool of reusable database connections to avoid the overhead of creating new connections for each request.",           cat: "database" },
+  { id: "d9",  q: "What is PostgreSQL?",                           a: "PostgreSQL is a powerful open-source relational database known for its reliability, feature richness, and standards compliance.",                    cat: "database" },
+  { id: "d10", q: "What is database normalization?",               a: "Normalization organizes database tables to reduce redundancy and improve data integrity by dividing data into related tables.",                      cat: "database" },
+
+  // Security
+  { id: "s1",  q: "What is SQL injection?",                        a: "SQL injection inserts malicious SQL code into queries, allowing attackers to access, modify, or delete database data.",                             cat: "security" },
+  { id: "s2",  q: "What is JWT?",                                  a: "JWT (JSON Web Token) is a compact token for stateless authentication, containing encoded user info and a cryptographic signature.",                  cat: "security" },
+  { id: "s3",  q: "What is CORS?",                                 a: "CORS (Cross-Origin Resource Sharing) controls which domains can make requests to your API as a browser security mechanism.",                        cat: "security" },
+  { id: "s4",  q: "What is bcrypt?",                               a: "bcrypt is a password hashing function that adds salt and uses multiple rounds to make brute-force attacks computationally expensive.",               cat: "security" },
+  { id: "s5",  q: "What is rate limiting?",                        a: "Rate limiting restricts the number of requests a client can make in a time window to prevent abuse and DDoS attacks.",                              cat: "security" },
+  { id: "s6",  q: "What is XSS?",                                  a: "XSS (Cross-Site Scripting) injects malicious scripts into web pages viewed by other users, stealing data or hijacking sessions.",                   cat: "security" },
+  { id: "s7",  q: "What is HTTPS?",                                a: "HTTPS encrypts data in transit using TLS/SSL certificates, preventing eavesdropping and man-in-the-middle attacks.",                                cat: "security" },
+  { id: "s8",  q: "What is OAuth?",                                a: "OAuth 2.0 is an authorization framework that enables secure third-party access to user resources without sharing passwords.",                        cat: "security" },
+  { id: "s9",  q: "What is helmet.js?",                            a: "helmet.js is an Express middleware that sets various HTTP security headers to protect against common web vulnerabilities.",                          cat: "security" },
+  { id: "s10", q: "What is input validation?",                     a: "Input validation checks user-provided data for correctness and safety before processing, preventing injection attacks and data corruption.",         cat: "security" },
+
+  // Performance
+  { id: "p1",  q: "What is caching?",                              a: "Caching stores frequently accessed data in fast storage (memory) to reduce database load and improve response times.",                               cat: "performance" },
+  { id: "p2",  q: "What is lazy loading?",                         a: "Lazy loading defers loading of resources until they are actually needed, improving initial load time and reducing memory usage.",                    cat: "performance" },
+  { id: "p3",  q: "What is load balancing?",                       a: "Load balancing distributes incoming requests across multiple servers to prevent overload and ensure high availability.",                             cat: "performance" },
+  { id: "p4",  q: "What is CDN?",                                  a: "CDN (Content Delivery Network) serves static assets from servers geographically close to users, reducing latency.",                                 cat: "performance" },
+  { id: "p5",  q: "What is gzip compression?",                     a: "Gzip compression reduces HTTP response size by compressing text-based content, significantly reducing bandwidth usage.",                            cat: "performance" },
+  { id: "p6",  q: "What is HTTP/2?",                               a: "HTTP/2 improves performance with multiplexing (multiple requests over one connection), header compression, and server push.",                       cat: "performance" },
+  { id: "p7",  q: "What is database query optimization?",          a: "Query optimization improves database performance by using indexes, avoiding SELECT *, and rewriting inefficient queries.",                          cat: "performance" },
+  { id: "p8",  q: "What is horizontal scaling?",                   a: "Horizontal scaling adds more servers to handle increased load, as opposed to vertical scaling which upgrades existing hardware.",                   cat: "performance" },
+  { id: "p9",  q: "What is a memory leak?",                        a: "A memory leak occurs when a program allocates memory but fails to release it, causing memory usage to grow until the system runs out.",             cat: "performance" },
+  { id: "p10", q: "What is profiling in Node.js?",                 a: "Profiling analyzes CPU and memory usage to identify performance bottlenecks using tools like node --prof or clinic.js.",                           cat: "performance" },
+];

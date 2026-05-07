@@ -1,0 +1,14 @@
+{
+  "name": "semantic-search-engine",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "ingest": "node ingest.js",
+    "search": "node cli.js"
+  },
+  "dependencies": {
+    "chromadb": "^1.8.1",
+    "openai": "^4.0.0",
+    "dotenv": "^16.0.0"
+  }
+}

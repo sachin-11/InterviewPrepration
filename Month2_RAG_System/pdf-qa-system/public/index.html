@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF Q&A</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#0f0f0f; color:#e0e0e0; height:100vh; display:flex; flex-direction:column; }
+
+    header { background:#1a1a1a; border-bottom:1px solid #2a2a2a; padding:14px 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    header h1 { font-size:18px; font-weight:600; color:#fff; }
+    #pdf-badge { font-size:12px; background:#6c63ff22; color:#6c63ff; padding:3px 10px; border-radius:12px; border:1px solid #6c63ff44; }
+    #clear-chat { margin-left:auto; font-size:12px; background:#2a2a2a; color:#aaa; border:1px solid #333; padding:6px 12px; border-radius:8px; cursor:pointer; }
+    #clear-chat:hover { color:#fff; border-color:#555; }
+
+    .layout { display:flex; flex:1; overflow:hidden; }
+
+    /* Sidebar */
+    .sidebar { width:260px; background:#141414; border-right:1px solid #2a2a2a; display:flex; flex-direction:column; padding:16px; gap:12px; }
+    .sidebar h3 { font-size:13px; color:#666; text-transform:uppercase; letter-spacing:1px; }
+
+    /* Drop zone */
+    #drop-zone { border:2px dashed #333; border-radius:12px; padding:24px 16px; text-align:center; cursor:pointer; transition:all 0.2s; }
+    #drop-zone:hover, #drop-zone.drag-over { border-color:#6c63ff; background:#6c63ff11; }
+    #drop-zone .icon { font-size:28px; margin-bottom:8px; }
+    #drop-zone p { font-size:13px; color:#666; }
+    #drop-zone span { font-size:11px; color:#444; }
+    #file-input { display:none; }
+
+    /* Upload progress */
+    #upload-status { font-size:12px; color:#aaa; min-height:20px; }
+    .progress-bar { height:4px; background:#333; border-radius:2px; overflow:hidden; display:none; }
+    .progress-fill { height:100%; background:#6c63ff; border-radius:2px; animation:progress 2s ease-in-out infinite; }
+    @keyframes progress { 0%{width:0%} 50%{width:70%} 100%{width:100%} }
+
+    /* PDF list */
+    #pdf-list { display:flex; flex-direction:column; gap:6px; }
+    .pdf-item { padding:8px 12px; border-radius:8px; border:1px solid #2a2a2a; cursor:pointer; font-size:13px; transition:all 0.2s; display:flex; align-items:center; gap:8px; }
+    .pdf-item:hover { border-color:#444; }
+    .pdf-item.active { background:#6c63ff22; border-color:#6c63ff; color:#6c63ff; }
+    .pdf-item .pdf-icon { font-size:16px; }
+
+    /* Chat area */
+    .chat-area { flex:1; display:flex; flex-direction:column; }
+    #chat-box { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:16px; }
+
+    .message { display:flex; gap:10px; max-width:80%; animation:fadeIn 0.2s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1} }
+    .message.user { align-self:flex-end; flex-direction:row-reverse; }
+    .message.bot  { align-self:flex-start; }
+
+    .avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .message.user .avatar { background:#6c63ff; }
+    .message.bot  .avatar { background:#2a2a2a; }
+
+    .bubble { padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.6; word-break:break-word; }
+    .message.user .bubble { background:#6c63ff; color:#fff; border-bottom-right-radius:4px; }
+    .message.bot  .bubble { background:#1e1e1e; color:#e0e0e0; border-bottom-left-radius:4px; border:1px solid #2a2a2a; }
+
+    /* Sources */
+    .sources { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; }
+    .source-tag { font-size:11px; background:#6c63ff22; color:#6c63ff; padding:2px 8px; border-radius:10px; border:1px solid #6c63ff44; cursor:default; max-width:100%; }
+    .source-tag .doc { opacity:0.85; font-weight:500; }
+
+    /* Typing */
+    .typing .bubble { display:flex; gap:4px; align-items:center; padding:14px; }
+    .dot { width:7px; height:7px; background:#666; border-radius:50%; animation:bounce 1.2s infinite; }
+    .dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
+    @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+    /* Input */
+    .input-area { background:#1a1a1a; border-top:1px solid #2a2a2a; padding:14px 20px; display:flex; gap:10px; align-items:flex-end; }
+    #user-input { flex:1; background:#252525; border:1px solid #333; border-radius:12px; padding:10px 14px; color:#e0e0e0; font-size:14px; resize:none; outline:none; max-height:120px; line-height:1.5; font-family:inherit; transition:border-color 0.2s; }
+    #user-input:focus { border-color:#6c63ff; }
+    #user-input::placeholder { color:#555; }
+    #send-btn { width:40px; height:40px; background:#6c63ff; border:none; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s; }
+    #send-btn:hover { background:#5a52e0; }
+    #send-btn:disabled { background:#333; cursor:not-allowed; }
+    #send-btn svg { width:18px; height:18px; fill:white; }
+
+    #chat-box::-webkit-scrollbar { width:4px; }
+    #chat-box::-webkit-scrollbar-thumb { background:#333; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ask Your Data</h1>
+    <span id="pdf-badge">No PDF selected</span>
+    <button type="button" id="clear-chat" title="Clear chat history">Clear chat</button>
+  </header>
+
+  <div class="layout">
+    <div class="sidebar">
+      <h3>Upload PDF</h3>
+      <div id="drop-zone">
+        <div class="icon">📂</div>
+        <p>Drop PDF here</p>
+        <span>or click to browse (multiple OK)</span>
+        <input type="file" id="file-input" accept=".pdf" multiple/>
+      </div>
+      <div class="progress-bar" id="progress-bar"><div class="progress-fill"></div></div>
+      <div id="upload-status"></div>
+
+      <h3 style="margin-top:8px">Your PDFs</h3>
+      <div id="pdf-list"><p style="font-size:12px;color:#444">No PDFs yet</p></div>
+    </div>
+
+    <div class="chat-area">
+      <div id="chat-box">
+        <div class="message bot">
+          <div class="avatar">🤖</div>
+          <div class="bubble">Upload one or more PDFs. Pick a document or <strong>Search All</strong>, then ask questions. Follow-up questions use chat history.</div>
+        </div>
+      </div>
+      <div class="input-area">
+        <textarea id="user-input" rows="1" placeholder="Ask a question about your PDF..."></textarea>
+        <button id="send-btn">
+          <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dropZone     = document.getElementById('drop-zone');
+    const fileInput    = document.getElementById('file-input');
+    const uploadStatus = document.getElementById('upload-status');
+    const progressBar  = document.getElementById('progress-bar');
+    const pdfList      = document.getElementById('pdf-list');
+    const pdfBadge     = document.getElementById('pdf-badge');
+    const chatBox      = document.getElementById('chat-box');
+    const input        = document.getElementById('user-input');
+    const sendBtn      = document.getElementById('send-btn');
+    const clearChatBtn = document.getElementById('clear-chat');
+
+    let currentPDF = null;
+    const pdfs = [];
+    /** @type {{ role: string, content: string }[]} */
+    let chatHistory = [];
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // ── Load PDF list from server (survives refresh) ───────
+    async function refreshPdfListFromServer() {
+      try {
+        const res = await fetch('/pdfs');
+        const data = await res.json();
+        pdfs.length = 0;
+        (data.pdfs || []).forEach((row) => {
+          if (row.pdfName && !pdfs.includes(row.pdfName)) pdfs.push(row.pdfName);
+        });
+        renderPDFList();
+      } catch (_) {
+        pdfList.innerHTML = '<p style="font-size:12px;color:#666">Could not load PDF list</p>';
+      }
+    }
+
+    // ── Drag & Drop ──────────────────────────────────────
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const files = [...e.dataTransfer.files].filter((f) => f.type === 'application/pdf');
+      if (!files.length) {
+        uploadStatus.textContent = '❌ Only PDF files allowed';
+        return;
+      }
+      if (files.length === 1) await uploadPDF(files[0]);
+      else await uploadPDFBatch(files);
+    });
+    fileInput.addEventListener('change', async () => {
+      const files = [...fileInput.files].filter((f) => f.type === 'application/pdf');
+      fileInput.value = '';
+      if (files.length === 1) await uploadPDF(files[0]);
+      else if (files.length > 1) await uploadPDFBatch(files);
+    });
+
+    // ── Upload (single file or one request for many files) ─
+    async function uploadPDF(file) {
+      uploadStatus.textContent = `Uploading ${file.name}...`;
+      progressBar.style.display = 'block';
+
+      const formData = new FormData();
+      formData.append('pdf', file);
+
+      try {
+        const res = await fetch('/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        progressBar.style.display = 'none';
+
+        if (data.success && data.results?.length) {
+          const last = data.results[data.results.length - 1];
+          uploadStatus.textContent = `✓ ${last.pdfName} (${last.pages} pages, ${last.chunks} chunks)`;
+          data.results.forEach((r) => addPDFToList(r.pdfName));
+          selectPDF(last.pdfName);
+        } else if (data.error) {
+          uploadStatus.textContent = `❌ ${data.error}`;
+        }
+      } catch {
+        progressBar.style.display = 'none';
+        uploadStatus.textContent = '❌ Upload failed';
+      }
+    }
+
+    async function uploadPDFBatch(files) {
+      uploadStatus.textContent = `Uploading ${files.length} PDFs...`;
+      progressBar.style.display = 'block';
+      const formData = new FormData();
+      files.forEach((f) => formData.append('pdf', f));
+      try {
+        const res = await fetch('/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        progressBar.style.display = 'none';
+        if (data.success && data.results?.length) {
+          const last = data.results[data.results.length - 1];
+          uploadStatus.textContent = `✓ ${data.results.length} file(s) — last: ${last.pdfName}`;
+          data.results.forEach((r) => addPDFToList(r.pdfName));
+          selectPDF(last.pdfName);
+        } else if (data.error) {
+          uploadStatus.textContent = `❌ ${data.error}`;
+        }
+      } catch {
+        progressBar.style.display = 'none';
+        uploadStatus.textContent = '❌ Upload failed';
+      }
+    }
+
+    function addPDFToList(pdfName) {
+      if (pdfs.includes(pdfName)) return;
+      pdfs.push(pdfName);
+      renderPDFList();
+    }
+
+    function renderPDFList() {
+      if (!pdfs.length) {
+        pdfList.innerHTML = '<p style="font-size:12px;color:#444">No PDFs yet</p>';
+        return;
+      }
+      pdfList.innerHTML = '';
+
+      const allItem = document.createElement('div');
+      allItem.className = 'pdf-item' + (!currentPDF ? ' active' : '');
+      allItem.dataset.pdf = '';
+      allItem.innerHTML = '<span class="pdf-icon">🔍</span>Search All';
+      allItem.addEventListener('click', () => selectPDF(null));
+      pdfList.appendChild(allItem);
+
+      pdfs.forEach((p) => {
+        const el = document.createElement('div');
+        el.className = 'pdf-item' + (p === currentPDF ? ' active' : '');
+        el.dataset.pdf = p;
+        el.style.justifyContent = 'space-between';
+        el.innerHTML = `
+          <span style="display:flex;align-items:center;gap:6px;min-width:0">
+            <span class="pdf-icon">📄</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p)}</span>
+          </span>
+          <span class="del-btn" title="Delete" style="color:#ff4444;cursor:pointer;font-size:14px;flex-shrink:0">✕</span>`;
+        el.querySelector('.del-btn').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (!confirm(`Delete "${p}"?`)) return;
+          await fetch(`/pdfs/${encodeURIComponent(p)}`, { method: 'DELETE' });
+          pdfs.splice(pdfs.indexOf(p), 1);
+          if (currentPDF === p) selectPDF(null);
+          renderPDFList();
+        });
+        el.addEventListener('click', () => selectPDF(p));
+        pdfList.appendChild(el);
+      });
+    }
+
+    function selectPDF(pdfName) {
+      currentPDF = pdfName;
+      pdfBadge.textContent = pdfName || 'All PDFs';
+      renderPDFList();
+      addMessage(
+        'bot',
+        pdfName
+          ? `Scope: **${pdfName}**`
+          : 'Scope: **all uploaded PDFs** (semantic search across every document).'
+      );
+    }
+
+    clearChatBtn.addEventListener('click', () => {
+      chatHistory = [];
+      chatBox.innerHTML = '';
+      addMessage('bot', 'Chat cleared. Upload more PDFs or ask a new question.');
+    });
+
+    // ── Chat ─────────────────────────────────────────────
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+    sendBtn.addEventListener('click', sendMessage);
+
+    function addMessage(role, text, sources = []) {
+      const div = document.createElement('div');
+      div.className = `message ${role}`;
+
+      let sourcesHTML = '';
+      if (sources.length) {
+        sourcesHTML = `<div class="sources">${sources.map((s) => {
+          const title = escapeHtml(s.text || '');
+          const doc = escapeHtml(s.source || 'doc');
+          return `<span class="source-tag" title="${title}"><span class="doc">${doc}</span> · p.${s.pageNum} · ${s.score}</span>`;
+        }).join('')}</div>`;
+      }
+
+      const bubbleHtml =
+        role === 'bot'
+          ? escapeHtml(text)
+              .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+              .replace(/\n/g, '<br>')
+          : escapeHtml(text).replace(/\n/g, '<br>');
+
+      div.innerHTML = `
+        <div class="avatar">${role === 'user' ? '👤' : '🤖'}</div>
+        <div>
+          <div class="bubble">${bubbleHtml}</div>
+          ${sourcesHTML}
+        </div>`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function addTyping() {
+      const div = document.createElement('div');
+      div.className = 'message bot typing';
+      div.id = 'typing';
+      div.innerHTML = '<div class="avatar">🤖</div><div class="bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      if (pdfs.length === 0) {
+        addMessage('bot', '⚠️ Upload at least one PDF first.');
+        return;
+      }
+
+      sendBtn.disabled = true;
+      input.value = '';
+      input.style.height = 'auto';
+      addMessage('user', text);
+      addTyping();
+
+      const historyPayload = [...chatHistory];
+
+      try {
+        const res = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: text,
+            pdfName: currentPDF,
+            topK: currentPDF ? 5 : 8,
+            history: historyPayload
+          })
+        });
+        const data = await res.json();
+        document.getElementById('typing')?.remove();
+
+        const answer = data.error ? `Error: ${data.error}` : (data.answer || '');
+        addMessage('bot', answer, data.sources || []);
+
+        if (!data.error && answer) {
+          chatHistory.push({ role: 'user', content: text });
+          chatHistory.push({ role: 'assistant', content: answer });
+          if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
+        }
+      } catch {
+        document.getElementById('typing')?.remove();
+        addMessage('bot', '❌ Server error. Is the server running?');
+      }
+
+      sendBtn.disabled = false;
+      input.focus();
+    }
+
+    refreshPdfListFromServer();
+  </script>
+</body>
+</html>

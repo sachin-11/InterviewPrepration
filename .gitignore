@@ -1,0 +1,156 @@
+# ─────────────────────────────────────────────────────────────
+# ROOT .gitignore
+# Covers: Node.js, Python, AI/ML, OS, Editor files
+# ─────────────────────────────────────────────────────────────
+
+
+# ── Node.js ───────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.npm
+.yarn/
+
+# Next.js build output
+.next/
+out/
+.vercel/
+
+
+# ── Python ────────────────────────────────────────────────────
+# Virtual environments
+venv/
+.venv/
+env/
+.env_python/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# mypy / type checking
+.mypy_cache/
+.dmypy.json
+
+
+# ── Environment Variables ─────────────────────────────────────
+# IMPORTANT: .env files contain secrets — never commit
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.env
+
+
+# ── AI / ML Specific ──────────────────────────────────────────
+# Vector DB data (chroma, faiss, etc.)
+chroma-data/
+*.sqlite3
+*.faiss
+*.index
+
+# Model files (too large for git)
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.gguf
+*.onnx
+
+# Embeddings cache
+embeddings_cache/
+.cache/
+
+# LangChain cache
+.langchain/
+
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+data/app.log
+data/*.log
+
+
+# ── Data Files (usually too large) ───────────────────────────
+# Comment out if you WANT to track these
+data/*.csv
+data/*.json
+data/*.parquet
+data/*.pkl
+data/*.pickle
+
+# But track sample/seed data (prefix with sample_)
+!data/sample_*.json
+!data/sample_*.csv
+
+
+# ── OS Files ──────────────────────────────────────────────────
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+
+# ── Editor / IDE ──────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json    # ye track kar sakte ho (team ke liye)
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+
+# ── Embedded Git Repos (nested projects with own .git) ───────
+Month2_RAG_System/PathCraft Laboratory SaaS/pathlab-saas/
+Month2_RAG_System/ai-resume-coach/
+Month2_RAG_System/nextjs-chatbot/
+Month2_RAG_System/second-brain-rag/
+ai-chat-backend/
+
+# Next.js build artifacts (subfolder mein bhi)
+Month2_RAG_System/auto-email-generator/.next/
+
+
+# ── Misc ──────────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.rar
+tmp/
+temp/
+.tmp/
