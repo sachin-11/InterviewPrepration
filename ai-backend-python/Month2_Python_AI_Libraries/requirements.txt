@@ -1,0 +1,27 @@
+# ============================================================
+# Month 2 Requirements
+# ============================================================
+
+# Numerical computing — foundation of all AI math
+numpy==1.26.4
+
+# Data analysis — training data preparation
+pandas==2.2.0
+
+# LangChain core — LLM application framework
+langchain==0.2.16
+langchain-core==0.2.38
+langchain-community==0.2.16
+
+# OpenAI integration for LangChain
+langchain-openai==0.1.23
+openai==1.40.0
+
+# LangGraph — stateful agent workflows
+langgraph==0.2.14
+
+# Environment variables
+python-dotenv==1.0.0
+
+# For vector similarity demos (no API key needed)
+scikit-learn==1.5.1

@@ -242,7 +242,8 @@ Example:
   "it" → kya refer karta hai? "cat" ya "mat"?
   
   Attention mechanism samajhta hai → "it" = "cat"
-  (mat tired nahi hoti, cat hoti hai)
+  (mat tired nahi hoti, cat hoti 
+  hai)
 
 Ye ability → LLM ko context samajhne mein help karti hai
 ```

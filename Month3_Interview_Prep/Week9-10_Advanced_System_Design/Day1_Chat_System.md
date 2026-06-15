@@ -305,6 +305,98 @@ Device token store:
     user_id, device_token, platform (ios/android), last_active
 ```
 
+### Important: Push Notification Reliable Kaise Banaye?
+```
+Problem:
+  FCM/APNs 100% guaranteed delivery nahi dete.
+  Kabhi network issue, OS battery optimization, invalid token,
+  notification permission off, ya app killed hone ki wajah se
+  notification miss ho sakti hai.
+
+Rule:
+  Push notification ko "source of truth" mat banao.
+  Source of truth = Cassandra message store + delivery/read ACK.
+```
+
+### Reliable Notification Flow:
+```
+1. Message receive:
+   Chat Server message ko Cassandra mein store karega.
+   Status = sent
+
+2. Recipient online hai:
+   WebSocket se message deliver karo.
+   Client ACK bheje: message_received(message_id)
+   Server status = delivered
+
+3. Recipient offline/background mein hai:
+   Notification Service FCM/APNs push bhejega.
+   Saath mein message_id / conversation_id payload mein bhejega.
+
+4. App open / foreground / reconnect:
+   Client last_received_message_id server ko bhejega.
+   Server Cassandra se missing messages fetch karke sync karega.
+
+5. Agar push miss ho gayi:
+   Koi data loss nahi hoga, kyunki message DB mein stored hai.
+   Next app open, reconnect, ya periodic background sync par
+   missing messages automatically aa jayenge.
+```
+
+### Retry + Ack Mechanism:
+```
+Notification Service:
+  1. FCM/APNs send karo
+  2. Response check karo:
+     - success      → notification_sent mark karo
+     - invalid token → token delete/update karo
+     - retryable error → exponential backoff retry
+  3. Notification events Kafka/DLQ mein store karo
+
+Client ACKs:
+  delivered_ack:
+    Device ne message receive kar liya
+
+  read_ack:
+    User ne chat open karke message dekh liya
+
+Server:
+  ACK nahi aaya to message "undelivered" rahega.
+  User reconnect kare to undelivered messages dobara sync honge.
+```
+
+### Android + iOS Best Practices:
+```
+Android:
+  - FCM high priority sirf real user messages ke liye use karo
+  - Notification permission check karo
+  - Doze mode ke liye data sync reconnect pe zaroor karo
+  - Token refresh handle karo
+
+iOS:
+  - APNs token refresh handle karo
+  - Background push limited hoti hai, us par guarantee mat rakho
+  - App foreground mein ho to local/in-app notification dikhao
+  - App open hote hi server sync mandatory rakho
+
+Common:
+  - Multiple devices per user support karo
+  - Har device ka separate device_token store karo
+  - Per-device delivery ACK track karo
+  - Push collapse key carefully use karo, warna old notifications replace ho sakti hain
+```
+
+### Interview Answer:
+```
+"FCM/APNs best-effort systems hain, isliye main push notification ko
+message delivery guarantee nahi maanta. Main pehle message durable store
+mein save karta hoon, phir WebSocket ya push se notify karta hoon.
+Client har message ka delivered/read ACK bhejta hai. Agar push miss ho jaye,
+client reconnect/app open par last_received_message_id bhejta hai aur server
+Cassandra se missing messages sync kar deta hai. Isse Android/iOS dono mein
+notification miss hone par bhi message loss nahi hota."
+```
+
 ---
 
 ## 10. Complete Architecture Diagram
